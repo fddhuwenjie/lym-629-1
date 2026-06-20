@@ -22,7 +22,6 @@ export const Requests = () => {
 
   const [statusFilter, setStatusFilter] = useState<RequestStatus | 'all'>('all');
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedRequest, setSelectedRequest] = useState<string | null>(null);
   const [toastVisible, setToastVisible] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('info');

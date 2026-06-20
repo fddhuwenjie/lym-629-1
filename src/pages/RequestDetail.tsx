@@ -20,7 +20,7 @@ export const RequestDetail = () => {
   const { getBookById, getCopyById } = useBookStore();
   const { getReaderById } = useReaderStore();
   const { getLibraryById } = useLibraryStore();
-  const { transfers, createTransfer, getTransfersByStatus } = useTransferStore();
+  const { transfers, createTransfer } = useTransferStore();
   const { borrowBook } = useBorrowStore();
   const { currentUser } = useAuthStore();
 

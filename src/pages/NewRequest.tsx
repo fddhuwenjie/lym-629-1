@@ -15,7 +15,6 @@ export const NewRequest = () => {
   const { getActiveLibraries } = useLibraryStore();
   const { createRequest } = useRequestStore();
   const { currentUser } = useAuthStore();
-  const { getReaderById } = useReaderStore();
 
   const [selectedBook, setSelectedBook] = useState<Book | null>(null);
   const [targetLibraryId, setTargetLibraryId] = useState('');

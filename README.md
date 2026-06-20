@@ -1,57 +1,325 @@
-# React + TypeScript + Vite
+# 图书馆馆际互借与催还系统
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Interlibrary Loan & Reminder System
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 系统概述
 
-## Expanding the ESLint configuration
+本系统是一个面向多馆点图书馆馆际互借与催还管理平台，支持读者提交借阅需求后，系统在多个馆藏点之间匹配可借副本，馆员可以发起调拨、到馆签收、借出和归还。所有业务数据自动持久化，支持逾期状态自动刷新。
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 运行说明
+
+### 环境要求
+
+- Node.js >= 18+
+- npm >= 9+
+
+### 安装与启动
+
+```bash
+# 安装依赖
+npm install
+
+# 启动开发服务器
+npm run dev
+
+# 访问系统
+# 浏览器打开 http://localhost:5173
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### 生产构建
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+# 类型检查 + 生产构建
+npm run build
 
-export default tseslint.config({
-  extends: [
-    // other configs...
-    // Enable lint rules for React
-    reactX.configs['recommended-typescript'],
-    // Enable lint rules for React DOM
-    reactDom.configs.recommended,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+# 预览构建产物
+npm run preview
+```
+
+### 代码规范检查
+
+```bash
+# ESLint 规范检查
+npm run lint
+
+# TypeScript 类型检查
+npm run check
+```
+
+### 演示账号
+
+系统内置演示数据，登录页面直接点击"登录系统"即可体验：
+
+- **馆员角色**：拥有全部权限，可执行所有操作
+- **读者角色**：可提交借阅申请、查询借阅状态
+
+---
+
+## 功能模块
+
+### 1. 馆藏流转看板
+
+首页总览，实时监控馆藏分布与流转状态：
+
+- 统计卡片：总馆藏量、可借副本、调拨中、逾期数量、在借数量、馆点数量、今日流转
+- 馆点库存分布：各分馆馆藏数量进度条展示
+- 流转记录时间线：副本位置变化历史记录
+- 快捷统计：在借/逾期/调拨中数量
+
+### 2. 借阅申请管理
+
+读者提交借阅需求，馆员匹配可借副本：
+
+- 新建申请：选择图书和目标馆点
+- 智能匹配：优先匹配目标馆点副本，排除已分配副本
+- 申请列表：支持搜索（书名、读者姓名、申请编号，状态筛选
+- 申请详情：图书信息、匹配副本、调拨记录、申请人信息
+- 操作：匹配副本、驳回申请、取消申请（读者）、发起调拨
+
+### 3. 调拨管理
+
+馆际图书调拨全流程：
+
+- 调拨单状态：待出库 → 运输中 → 已签收 → 已取消
+- 操作：确认出库、到馆签收、取消调拨
+- 取消调拨：自动将副本回库到源馆点，关联申请恢复待匹配状态
+- 流转记录：每次调拨操作全程留痕
+
+### 4. 借还管理
+
+图书借出、归还与续借：
+
+**借出登记**
+- 选择借出馆点
+- 搜索可借副本和读者
+- 校验：副本状态、读者欠费
+
+**归还登记**
+- 条码扫描定位副本
+- 校验：归还馆点与借出馆点一致性
+- 自动计算逾期罚款
+
+**续借办理**
+- 按读者查询在借图书
+- 校验：续借次数超限、读者欠费
+
+### 5. 逾期催还
+
+逾期图书管理与催还：
+
+- 逾期列表：逾期天数、罚款金额、催还次数
+- 催还方式：邮件、电话、短信
+- 催还记录：每次催还操作留痕
+- 逾期状态：系统每分钟自动刷新
+- 罚款金额：自动按逾期天数 × 0.5元/天
+
+### 6. 读者档案
+
+读者信息与借阅历史：
+
+- 读者列表：搜索（姓名、证号、电话、邮箱
+- 在借图书：当前未归还图书列表
+- 借阅历史：历史借阅记录
+- 欠费记录：逾期欠费与缴费
+- 缴费操作：处理读者欠费
+
+### 7. 记录导出
+
+借阅与逾期记录导出：
+
+**导出类型**
+- 借阅记录：全部借阅历史
+- 逾期记录：逾期未还图书
+
+**导出字段**
+- 借阅编号、图书名称、副本条码
+- 读者姓名、读者证号、联系电话
+- 借出馆点、借出日期、应还日期、归还日期
+- 续借次数、催还次数、借阅状态
+- 罚款金额、当前副本位置
+
+**导出历史**
+- 所有导出操作记录，可复查
+- 自动持久化，重启后保留
+
+### 8. 系统设置
+
+基础数据管理：
+
+- 馆点管理：增删改馆点信息
+- 图书管理：增删改图书信息
+- 副本管理：为图书添加副本
+- 数据管理：查看数据统计，重置演示数据
+
+---
+
+## 异常校验
+
+系统对以下异常场景进行校验并提示原因：
+
+| 异常场景 | 校验时机 | 错误提示 |
+|----------|----------|----------|
+| **副本已外借 | 借出时 | "该副本已外借，无法借出" |
+| **调拨途中重复分配 | 匹配副本时 | 自动排除已匹配/调拨中副本，不重复分配 |
+| **读者欠费未处理 | 借出/续借时 | "读者存在欠费未处理，请先缴清费用" |
+| **续借次数超限 | 续借时 | "续借次数超限，最多可续借X次" |
+| **归还馆点不一致 | 归还时 | "归还馆点与借出馆点不一致，请归还到借出馆点" |
+| **副本不在当前馆点 | 借出时 | "副本不在当前馆点，无法借出" |
+
+---
+
+## 验收要点
+
+### 1. 取消调拨回库
+
+验收步骤：
+1. 提交借阅申请并匹配副本
+2. 发起调拨并确认出库
+3. 取消调拨
+4. 验证：
+   - 副本位置：副本返回源馆点
+   - 副本状态：恢复为可借（available）
+   - 关联申请：恢复为待匹配（pending）状态
+   - 流转记录：生成"调拨取消，副本回库记录
+
+### 2. 逾期自动刷新
+
+验收步骤：
+1. 系统每分钟自动执行 `checkOverdue()`
+2. 验证：
+   - 超过应还日期的借阅记录自动变为"逾期"状态
+   - 罚款金额自动计算并更新（0.5元/天
+   - 看板逾期数量统计自动更新
+
+### 3. 欠费拦截
+
+验收步骤：
+1. 选择有欠费的读者
+2. 尝试借出或续借图书
+3. 验证：
+   - 操作被拦截
+   - 提示"读者存在欠费未处理，请先缴清费用
+
+### 4. 续借次数超限
+
+验收步骤：
+1. 对同一本图书连续续借超过最大次数（读者默认2次，教师3次，教授5次）
+2. 验证：
+   - 超过次数后续借被拦截
+   - 提示"续借次数超限，最多可续借X次"
+
+### 5. 归还馆点不一致
+
+验收步骤：
+1. 在中心图书馆借出图书
+2. 在其他馆点尝试归还
+3. 验证：
+   - 归还被拦截
+   - 提示"归还馆点与借出馆点不一致，请归还到借出馆点"
+
+### 6. 导出历史持久化
+
+验收步骤：
+1. 执行多次导出操作
+2. 刷新页面或重启浏览器
+3. 验证：
+   - 导出历史记录完整保留
+   - 所有业务数据（副本位置、申请状态、催还记录均保留
+   - 导出的CSV文件包含催还次数和当前副本位置字段
+
+---
+
+## 核心参数配置
+
+| 参数 | 配置值 | 说明 |
+|------|--------|------|
+| 借阅期限 | 30天 | 默认借阅时长 |
+| 最大续借次数 | 2-5次 | 读者2次、教师3次、教授5次 |
+| 续借延长期限 | 30天 | 每次续借延长30天 |
+| 逾期罚款 | 0.5元/天 | 逾期每日罚款金额 |
+| 催还方式 | 邮件/电话/短信 | 三种催还通知方式 |
+
+---
+
+## 技术架构
+
+- **前端框架**：React 18 + TypeScript
+- **构建工具**：Vite 6
+- **状态管理**：Zustand 5（persist 中间件实现 localStorage 持久化）
+- **路由**：React Router v7
+- **样式**：TailwindCSS 3
+- **图标库**：Lucide React
+- **日期处理**：date-fns
+- **数据持久化**：localStorage（zustand persist 中间件
+- **导出**：原生 Blob + URL.createObjectURL 实现 CSV 下载
+
+### 数据持久化
+
+所有业务数据通过 zustand persist 中间件自动保存到浏览器 localStorage，包括：
+
+- 馆员/读者登录状态
+- 馆点、图书、副本数据
+- 读者信息与欠费
+- 借阅申请与状态
+- 调拨单与流转记录
+- 借阅记录与催还记录
+- 导出历史记录
+
+重启浏览器后所有数据可复查。
+
+### 设计风格
+
+- 主色调：藏蓝 (#1e3a5f)
+- 强调色：暖金 (#d4a853)
+- 标题字体：Lora 衬线字体
+- 正文字体：Noto Sans SC
+
+---
+
+## 项目结构
+
+```
+src/
+├── types/           # TypeScript 类型定义
+│   └── index.ts      # 核心数据模型与状态枚举
+├── constants/       # 常量配置
+│   └── index.ts      # 业务参数、状态标签
+├── utils/           # 工具函数
+│   ├── date.ts       # 日期处理
+│   ├── csv.ts        # CSV 导出
+│   └── id.ts         # ID 生成
+├── stores/         # 状态管理 (Zustand)
+│   ├── authStore.ts      # 认证状态
+│   ├── libraryStore.ts   # 馆点管理
+│   ├── bookStore.ts      # 图书与副本
+│   ├── readerStore.ts    # 读者管理
+│   ├── requestStore.ts   # 借阅申请
+│   ├── transferStore.ts  # 调拨管理
+│   ├── borrowStore.ts    # 借阅管理
+│   └── exportStore.ts    # 导出历史
+├── components/   # 通用组件
+│   ├── Layout.tsx        # 主布局
+│   ├── Sidebar.tsx     # 侧边栏导航
+│   ├── StatusBadge.tsx # 状态标签
+│   ├── Modal.tsx         # 模态框
+│   └── Toast.tsx        # Toast 提示
+├── pages/          # 页面组件
+│   ├── Login.tsx        # 登录页
+│   ├── Dashboard.tsx   # 馆藏流转看板
+│   ├── Requests.tsx    # 借阅申请列表
+│   ├── NewRequest.tsx  # 新建申请
+│   ├── RequestDetail.tsx # 申请详情
+│   ├── Transfers.tsx   # 调拨管理
+│   ├── Borrow.tsx        # 借还管理
+│   ├── Overdue.tsx      # 逾期催还
+│   ├── Readers.tsx        # 读者档案列表
+│   ├── ReaderDetail.tsx # 读者详情
+│   ├── Export.tsx          # 记录导出
+│   └── Settings.tsx      # 系统设置
+├── App.tsx           # 路由配置
+└── index.css       # 全局样式
 ```

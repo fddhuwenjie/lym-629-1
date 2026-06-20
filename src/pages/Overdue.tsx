@@ -4,7 +4,6 @@ import { useBorrowStore } from '../stores/borrowStore';
 import { useBookStore } from '../stores/bookStore';
 import { useReaderStore } from '../stores/readerStore';
 import { useLibraryStore } from '../stores/libraryStore';
-import { StatusBadge } from '../components/StatusBadge';
 import { formatDate } from '../utils/date';
 import { getOverdueDays } from '../utils/date';
 import { Toast } from '../components/Toast';

@@ -107,9 +107,8 @@ export const useBorrowStore = create<BorrowState>()(
       reminderRecords: initialReminderRecords,
       borrowBook: (data) => {
         const { copyId, readerId, borrowLibraryId, requestId } = data;
-        const { copies, getCopyById, updateCopyStatus } = useBookStore.getState();
+        const { getCopyById, updateCopyStatus } = useBookStore.getState();
         const { getReaderById } = useReaderStore.getState();
-        const { getRequestById } = useRequestStore.getState();
         const currentUser = useAuthStore.getState().currentUser;
 
         const copy = getCopyById(copyId);
@@ -182,7 +181,7 @@ export const useBorrowStore = create<BorrowState>()(
         return { success: true, message: '借出成功', record: newRecord };
       },
       returnBook: (copyId, returnLibraryId) => {
-        const { getCopyById, updateCopyStatus, updateCopyLocation } = useBookStore.getState();
+        const { updateCopyStatus, updateCopyLocation } = useBookStore.getState();
         const { getReaderById, updateDebt } = useReaderStore.getState();
         const currentUser = useAuthStore.getState().currentUser;
 

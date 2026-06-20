@@ -24,8 +24,8 @@ export const Borrow = () => {
   const [returnLibraryId, setReturnLibraryId] = useState<string>('lib_main');
   const [renewKeyword, setRenewKeyword] = useState('');
 
-  const { copies, getCopyById, getBookById, searchBooks } = useBookStore();
-  const { readers, getReaderById, searchReaders } = useReaderStore();
+  const { copies, getCopyById, getBookById } = useBookStore();
+  const { getReaderById, searchReaders } = useReaderStore();
   const { borrowBook, returnBook, renewBook, getActiveBorrowsByReader, getOverdueRecords } =
     useBorrowStore();
   const { getActiveLibraries, getLibraryById } = useLibraryStore();

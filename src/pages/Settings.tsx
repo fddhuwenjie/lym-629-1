@@ -3,11 +3,6 @@ import { Settings as SettingsIcon, Building2, BookOpen, Plus, Trash2, Edit2, Dat
 import { useLibraryStore } from '../stores/libraryStore';
 import { useBookStore } from '../stores/bookStore';
 import { useReaderStore } from '../stores/readerStore';
-import { useRequestStore } from '../stores/requestStore';
-import { useTransferStore } from '../stores/transferStore';
-import { useBorrowStore } from '../stores/borrowStore';
-import { useExportStore } from '../stores/exportStore';
-import { useAuthStore } from '../stores/authStore';
 import { Modal } from '../components/Modal';
 import { Toast } from '../components/Toast';
 import { formatDate } from '../utils/date';
@@ -18,7 +13,7 @@ type TabType = 'libraries' | 'books' | 'data';
 export const Settings = () => {
   const [activeTab, setActiveTab] = useState<TabType>('libraries');
   const { libraries, addLibrary, updateLibrary, deleteLibrary } = useLibraryStore();
-  const { books, copies, addBook, deleteBook, addCopy, updateCopy, deleteCopy } = useBookStore();
+  const { books, copies, addBook, deleteBook, addCopy, deleteCopy } = useBookStore();
 
   const [libraryModalOpen, setLibraryModalOpen] = useState(false);
   const [editingLibrary, setEditingLibrary] = useState<string | null>(null);

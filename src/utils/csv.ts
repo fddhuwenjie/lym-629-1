@@ -7,8 +7,7 @@ export interface ExportColumn {
 
 export const exportToCSV = (
   data: Record<string, unknown>[],
-  columns: ExportColumn[],
-  filename: string
+  columns: ExportColumn[]
 ): string => {
   const header = columns.map((col) => col.label).join(',');
   const rows = data.map((row) =>
@@ -35,7 +34,7 @@ export const downloadCSV = (
   columns: ExportColumn[],
   filename: string
 ): void => {
-  const csvContent = exportToCSV(data, columns, filename);
+  const csvContent = exportToCSV(data, columns);
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
