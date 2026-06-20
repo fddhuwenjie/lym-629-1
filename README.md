@@ -1,13 +1,57 @@
-# 图书馆馆际互借与催还系统
+# React + TypeScript + Vite
 
-任务类型：0-1代码生成
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-业务领域：全栈Web应用
+Currently, two official plugins are available:
 
-修改范围：跨模块多文件
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-任务难度：中等偏难
+## Expanding the ESLint configuration
 
-题面：
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-构建一个图书馆馆际互借与催还系统，读者提交借阅需求后，系统在多个馆藏点之间匹配可借副本，馆员可以发起调拨、到馆签收、借出和归还。正常流程要能完成申请、调拨、借出、续借、归还和状态查询，副本位置变化要形成流转记录。副本已外借、调拨途中被重复分配、读者欠费未处理、续借次数超限、归还馆点不一致都要提示原因。系统要有馆藏流转看板、逾期催还列表、读者借阅档案和借阅记录导出，导出包含催还次数和当前副本位置。重启后副本位置、申请状态、催还记录和导出历史可复查。验收还要检查取消调拨后的副本回库和逾期状态自动刷新。
+```js
+export default tseslint.config({
+  extends: [
+    // Remove ...tseslint.configs.recommended and replace with this
+    ...tseslint.configs.recommendedTypeChecked,
+    // Alternatively, use this for stricter rules
+    ...tseslint.configs.strictTypeChecked,
+    // Optionally, add this for stylistic rules
+    ...tseslint.configs.stylisticTypeChecked,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
+
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default tseslint.config({
+  extends: [
+    // other configs...
+    // Enable lint rules for React
+    reactX.configs['recommended-typescript'],
+    // Enable lint rules for React DOM
+    reactDom.configs.recommended,
+  ],
+  languageOptions: {
+    // other options...
+    parserOptions: {
+      project: ['./tsconfig.node.json', './tsconfig.app.json'],
+      tsconfigRootDir: import.meta.dirname,
+    },
+  },
+})
+```
