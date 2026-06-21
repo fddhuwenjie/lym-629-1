@@ -9,12 +9,14 @@ import {
   Mail,
   Phone,
   CreditCard,
+  RefreshCw,
 } from 'lucide-react';
 import { useReaderStore } from '../stores/readerStore';
 import { useBorrowStore } from '../stores/borrowStore';
 import { useBookStore } from '../stores/bookStore';
 import { useLibraryStore } from '../stores/libraryStore';
 import { StatusBadge } from '../components/StatusBadge';
+import { Toast } from '../components/Toast';
 import { formatDate } from '../utils/date';
 import { getOverdueDays } from '../utils/date';
 
@@ -29,6 +31,9 @@ export const ReaderDetail = () => {
   const { getLibraryById } = useLibraryStore();
 
   const [activeTab, setActiveTab] = useState<TabType>('borrowing');
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
 
   const reader = getReaderById(id || '');
 
@@ -47,14 +52,24 @@ export const ReaderDetail = () => {
   const allBorrows = getAllBorrowsByReader(reader.id);
   const overdueCount = activeBorrows.filter((b) => b.status === 'overdue').length;
 
+  const showToast = (message: string, type: 'success' | 'error' | 'info') => {
+    setToastMessage(message);
+    setToastType(type);
+    setToastVisible(true);
+  };
+
   const handleRenew = (recordId: string) => {
-    renewBook(recordId);
+    const result = renewBook(recordId);
+    showToast(result.message, result.success ? 'success' : 'info');
   };
 
   const handlePayFine = () => {
-    if (reader.debt > 0) {
-      updateDebt(reader.id, -reader.debt);
-    }
+    if (!reader || reader.debt <= 0) return;
+    const result = updateDebt(reader.id, -reader.debt);
+    showToast(
+      result.message,
+      result.success ? 'success' : 'error'
+    );
   };
 
   const tabs = [
@@ -83,8 +98,9 @@ export const ReaderDetail = () => {
             <User size={36} className="text-[#d4a853]" />
           </div>
           <div className="flex-1">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-wrap">
               <h2 className="text-xl font-bold text-gray-900">{reader.name}</h2>
+              <StatusBadge type="risk" status={reader.riskLevel} size="sm" />
               {reader.debt > 0 && (
                 <span className="px-2 py-0.5 bg-red-100 text-red-700 text-xs rounded-full">
                   有欠费
@@ -213,12 +229,23 @@ export const ReaderDetail = () => {
                           <p className="text-sm text-gray-500 mt-1">
                             副本：{copy?.barcode} · {library?.name}
                           </p>
-                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 flex-wrap">
                             <span>借出：{formatDate(record.borrowDate, 'yyyy-MM-dd')}</span>
                             <span className={overdueDays > 0 ? 'text-red-600' : ''}>
                               应还：{formatDate(record.dueDate, 'yyyy-MM-dd')}
                             </span>
-                            <span>已续借 {record.renewTimes} 次</span>
+                            <span>已续借 {record.renewTimes}/{reader.maxRenewTimes} 次</span>
+                            {record.missedRenewCount > 0 && (
+                              <span className="text-amber-600 flex items-center gap-1">
+                                <RefreshCw size={12} />
+                                待补发 {record.missedRenewCount} 次
+                              </span>
+                            )}
+                            {record.autoRestored && (
+                              <span className="px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 font-medium">
+                                已自动补发
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -357,6 +384,13 @@ export const ReaderDetail = () => {
           )}
         </div>
       </div>
+
+      <Toast
+        type={toastType}
+        message={toastMessage}
+        isVisible={toastVisible}
+        onClose={() => setToastVisible(false)}
+      />
     </div>
   );
 };

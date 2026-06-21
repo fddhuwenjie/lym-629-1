@@ -2,11 +2,26 @@ export type CopyStatus = 'available' | 'borrowed' | 'transferring' | 'lost' | 'd
 
 export type RequestStatus = 'pending' | 'matched' | 'transferring' | 'arrived' | 'borrowed' | 'completed' | 'cancelled' | 'rejected';
 
-export type TransferStatus = 'pending' | 'in_transit' | 'arrived' | 'cancelled';
+export type TransferStatus = 'pending' | 'in_transit' | 'arrived' | 'cancelled' | 'rolled_back';
 
 export type BorrowStatus = 'borrowed' | 'returned' | 'overdue' | 'renewed' | 'lost';
 
 export type UserRole = 'librarian' | 'reader';
+
+export type RiskLevel = 'low' | 'medium' | 'high';
+
+export type OverdueTier = 'tier1' | 'tier2' | 'tier3' | 'tier4';
+
+export interface TransferChain {
+  id: string;
+  copyId: string;
+  requestId?: string;
+  transferIds: string[];
+  status: 'active' | 'completed' | 'rolled_back';
+  createdAt: string;
+  rolledBackAt?: string;
+  rollbackReason?: string;
+}
 
 export interface Library {
   id: string;
@@ -43,6 +58,7 @@ export interface Reader {
   email: string;
   debt: number;
   maxRenewTimes: number;
+  riskLevel: RiskLevel;
   createdAt: string;
 }
 
@@ -61,6 +77,9 @@ export interface BorrowRequest {
 export interface Transfer {
   id: string;
   requestId?: string;
+  chainId?: string;
+  prevTransferId?: string;
+  nextTransferId?: string;
   copyId: string;
   fromLibraryId: string;
   toLibraryId: string;
@@ -69,6 +88,7 @@ export interface Transfer {
   createdAt: string;
   arrivedAt?: string;
   cancelledAt?: string;
+  rolledBackAt?: string;
 }
 
 export interface TransferRecord {
@@ -97,6 +117,8 @@ export interface BorrowRecord {
   reminderCount: number;
   status: BorrowStatus;
   fine: number;
+  missedRenewCount: number;
+  autoRestored: boolean;
   createdAt: string;
 }
 
@@ -111,8 +133,9 @@ export interface ReminderRecord {
 export interface ExportHistory {
   id: string;
   fileName: string;
-  type: 'borrow_records' | 'overdue' | 'transfer';
+  type: 'borrow_records' | 'overdue' | 'transfer' | 'overdue_stat' | 'transfer_chain';
   recordCount: number;
+  filters?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -121,4 +144,27 @@ export interface User {
   name: string;
   role: UserRole;
   avatar?: string;
+}
+
+export interface OverdueStatRow {
+  readerId: string;
+  readerName: string;
+  readerCardNo: string;
+  riskLevel: RiskLevel;
+  libraryId: string;
+  libraryName: string;
+  overdueDays: number;
+  overdueTier: OverdueTier;
+  overdueCount: number;
+  totalFine: number;
+}
+
+export interface OverdueFilters {
+  riskLevels?: RiskLevel[];
+  libraryIds?: string[];
+  overdueTier?: OverdueTier;
+  minOverdueDays?: number;
+  maxOverdueDays?: number;
+  startDate?: string;
+  endDate?: string;
 }

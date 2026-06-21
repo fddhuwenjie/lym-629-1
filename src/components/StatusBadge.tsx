@@ -1,7 +1,7 @@
 import { STATUS_LABELS, STATUS_COLORS } from '../constants';
 
 interface StatusBadgeProps {
-  type: 'copy' | 'request' | 'transfer' | 'borrow';
+  type: 'copy' | 'request' | 'transfer' | 'borrow' | 'risk' | 'overdueTier' | 'chain';
   status: string;
   size?: 'sm' | 'md';
 }
